@@ -1,17 +1,19 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pagina-inicial',
-  imports: [NgIf],
+  imports: [NgIf, NgFor],
   templateUrl: './pagina-inicial.component.html',
   styleUrl: './pagina-inicial.component.scss'
 })
 export class PaginaInicialComponent {
-  mensaje: string = '';
+  [x: string]: any;
+  mensaje: string[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -40,8 +42,20 @@ export class PaginaInicialComponent {
 
     this.http.post('http://localhost:8080/api/documentos/upload', formData, { responseType: 'text' })
       .subscribe({
-        next: res => this.mensaje = res,
-        error: err => this.mensaje = 'Error al subir el archivo'
+        next: res => {
+          // Puedes guardar el nombre en localStorage o en una variable compartida
+          localStorage.setItem('nombreArchivo', archivo.name); 
+          this.router.navigate(['/mostrar-archivo']); // redirige al componente
+        },
+        error: err => {
+          this.mensaje = [
+            'Error al subir el archivo, no es compatible. Pruebe a usar uno de los siguientes:',
+            '  - DOC',
+            '  - PDF',
+            '  - DOCX',
+            '  - TXT'
+          ];
+        }
       });
   }
 }

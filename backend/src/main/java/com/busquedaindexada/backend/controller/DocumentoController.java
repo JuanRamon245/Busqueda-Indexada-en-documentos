@@ -1,5 +1,7 @@
 package com.busquedaindexada.backend.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,14 +22,25 @@ public class DocumentoController {
             return ResponseEntity.badRequest().body("Archivo vacío");
         }
 
-        try {
-            String nombreArchivo = file.getOriginalFilename();
-            long tamaño = file.getSize();
-            System.out.println("Archivo recibido: " + nombreArchivo + " (" + tamaño + " bytes)");
+        List<String> tiposPermitidos = List.of(
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/plain");
 
-            return ResponseEntity.ok("Archivo '" + nombreArchivo + "' subido correctamente.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al subir el archivo: " + e.getMessage());
+        String tipoArchivo = file.getContentType();
+        String nombreArchivo = file.getOriginalFilename();
+        long tamaño = file.getSize();
+
+        System.out.println("Archivo recibido: " + nombreArchivo + " (" + tamaño + " bytes)");
+        System.out.println("Tipo MIME: " + tipoArchivo);
+
+        if (!tiposPermitidos.contains(tipoArchivo)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Archivo no compatible. Solo se permiten archivos de texto como PDF, DOC, DOCX o TXT.");
         }
+
+        return ResponseEntity.ok("Archivo '" + nombreArchivo + "' subido correctamente.");
     }
 }

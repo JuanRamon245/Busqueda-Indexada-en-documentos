@@ -1,0 +1,8 @@
+<ng-container *ngIf="nombreArchivo">
+  <h2>Mostrando: {{ nombreArchivo }}</h2>
+  <iframe
+    [src]="'http://localhost:8080/api/documentos/archivo/' + nombreArchivo | safeUrl"
+    width="100%"
+    height="600px">
+  </iframe>
+</ng-container>

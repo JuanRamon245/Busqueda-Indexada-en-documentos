@@ -1,7 +1,11 @@
 <div class="contenedor-subida" (drop)="onDrop($event)" (dragover)="onDragOver($event)">
-  <h2>Sube tu archivo PDF</h2>
+  <h2>Sube tu archivo</h2>
+  <br/><br/>
   <button (click)="fileInput.click()">Seleccionar archivo</button>
   <input #fileInput type="file" hidden (change)="onFileSelected($event)">
-  <p *ngIf="mensaje">{{ mensaje }}</p>
+  <br/><br/>
+  <div *ngIf="mensaje.length > 0" >
+    <p *ngFor="let linea of mensaje">{{ linea }}</p>
+  </div>
 </div>
 
