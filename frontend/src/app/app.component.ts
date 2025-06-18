@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DocumentoService } from './services/documento.service';
+import { PaginaInicialComponent } from "./pagina-inicial/pagina-inicial.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, PaginaInicialComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
