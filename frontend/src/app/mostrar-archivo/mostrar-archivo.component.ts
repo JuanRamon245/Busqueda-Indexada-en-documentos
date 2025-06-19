@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { SafeUrlPipe } from "../safe-url.pipe";
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-mostrar-archivo',
-  imports: [],
+  imports: [NgIf, SafeUrlPipe],
   templateUrl: './mostrar-archivo.component.html',
   styleUrl: './mostrar-archivo.component.scss'
 })

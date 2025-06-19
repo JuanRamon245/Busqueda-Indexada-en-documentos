@@ -43,9 +43,8 @@ export class PaginaInicialComponent {
     this.http.post('http://localhost:8080/api/documentos/upload', formData, { responseType: 'text' })
       .subscribe({
         next: res => {
-          // Puedes guardar el nombre en localStorage o en una variable compartida
           localStorage.setItem('nombreArchivo', archivo.name); 
-          this.router.navigate(['/mostrar-archivo']); // redirige al componente
+          this.router.navigate(['/mostrar-archivo']);
         },
         error: err => {
           this.mensaje = [
