@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgIf, NgFor } from '@angular/common';
 import { Router } from '@angular/router';
+import { DocumentoService } from '../services/documento.service';
 
 @Component({
   selector: 'app-pagina-inicial',
@@ -13,7 +14,7 @@ export class PaginaInicialComponent {
   [x: string]: any;
   mensaje: string[] = [];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private documentoService: DocumentoService) {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -37,24 +38,21 @@ export class PaginaInicialComponent {
   }
 
   subirArchivo(archivo: File): void {
-    const formData = new FormData();
-    formData.append('file', archivo);
+    this.documentoService.archivoSeleccionado = archivo;
 
-    this.http.post('http://localhost:8080/api/documentos/upload', formData, { responseType: 'text' })
-      .subscribe({
-        next: res => {
-          localStorage.setItem('nombreArchivo', archivo.name); 
-          this.router.navigate(['/mostrar-archivo']);
-        },
-        error: err => {
-          this.mensaje = [
-            'Error al subir el archivo, no es compatible. Pruebe a usar uno de los siguientes:',
-            '  - DOC',
-            '  - PDF',
-            '  - DOCX',
-            '  - TXT'
-          ];
-        }
-      });
+  this.documentoService.subirArchivo(archivo).subscribe({
+    next: res => {
+      this.router.navigate(['/mostrar-archivo']);
+    },
+    error: err => {
+      this.mensaje = [
+        'Error al subir el archivo, no es compatible. Pruebe a usar uno de los siguientes:',
+        '  - DOC',
+        '  - PDF',
+        '  - DOCX',
+        '  - TXT'
+      ];
+    }
+  });
   }
 }

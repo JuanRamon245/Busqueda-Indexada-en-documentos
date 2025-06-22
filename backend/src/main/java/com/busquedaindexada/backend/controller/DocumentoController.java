@@ -7,6 +7,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
@@ -85,6 +91,53 @@ public class DocumentoController {
 
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/extraer-texto")
+    public ResponseEntity<String> extraerTexto(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Archivo vacío");
+        }
+
+        try {
+            String tipo = file.getContentType();
+            String textoExtraido = "";
+
+            switch (tipo) {
+                case "application/pdf":
+                    try (PDDocument pdf = PDDocument.load(file.getInputStream())) {
+                        PDFTextStripper stripper = new PDFTextStripper();
+                        textoExtraido = stripper.getText(pdf);
+                    }
+                    break;
+
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                    try (XWPFDocument docx = new XWPFDocument(file.getInputStream())) {
+                        XWPFWordExtractor extractor = new XWPFWordExtractor(docx);
+                        textoExtraido = extractor.getText();
+                    }
+                    break;
+
+                case "application/msword":
+                    try (HWPFDocument doc = new HWPFDocument(file.getInputStream())) {
+                        WordExtractor extractor = new WordExtractor(doc);
+                        textoExtraido = extractor.getText();
+                    }
+                    break;
+
+                case "text/plain":
+                    textoExtraido = new String(file.getBytes());
+                    break;
+
+                default:
+                    return ResponseEntity.badRequest().body("Tipo de archivo no soportado");
+            }
+
+            return ResponseEntity.ok(textoExtraido);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al procesar el archivo: " + e.getMessage());
         }
     }
 }
